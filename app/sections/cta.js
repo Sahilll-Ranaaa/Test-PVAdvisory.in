@@ -32,7 +32,7 @@ export default function CTA() {
                 </p>
               </h3>
               <h2 className="text-6xl font-extrabold flex-1 text-left text-white">
-                together
+                Together
               </h2>
             </div>
           </div>
