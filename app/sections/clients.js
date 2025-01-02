@@ -94,6 +94,10 @@ const ourClients = [
   },
   {
     id: 20,
+    imageUrl: "/clients/hfs.png",
+  },
+  {
+    id: 21,
     imageUrl: "/clients/autometers.png",
     className: "scale-[0.7] hover:scale-[0.8]",
   },
@@ -102,16 +106,16 @@ const ourClients = [
     imageUrl: "/clients/comviva.png",
   },
   {
-    id: 21,
+    id: 23,
     imageUrl: "/clients/chakiat.png",
     className: "scale-[1.7] hover:scale-[1.8]",
   },
   {
-    id: 23,
+    id: 24,
     imageUrl: "/clients/ghm.png",
   },
   {
-    id: 24,
+    id: 25,
     imageUrl: "/clients/The capital.png",
     className: "scale-[1.4] hover:scale-[1.5]",
   },
