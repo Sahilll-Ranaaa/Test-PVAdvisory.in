@@ -1,23 +1,21 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
-import { ArrowRight, ChevronRight } from "lucide-react";
-import Link from "next/link";
 
 const services = [
   {
     url: "/customized.png",
     title: "Customized Application Development",
-    description: "Lorem Ipsum Lorem Ipsum Lorem Ipsum",
+    description:
+      "Tailored software solutions designed to meet your unique business needs with seamless performance and scalability",
     imageClassName: "-left-4",
   },
 
   {
     url: "/analytics.png",
     title: "Application Support Services",
-    description: "Lorem Ipsum Lorem Ipsum Lorem Ipsum",
+    description:
+      "Ensure seamless performance and reliability with our expert application support services, providing maintenance, monitoring, and issue resolution.",
     imageClassName: "-left-2",
   },
 ];
@@ -53,34 +51,6 @@ export default function Services({ className }) {
               className="absolute -top-[2px] -left-[0.5px] h-[2px] bg-app"
             ></motion.div>
             <div className="space-y-1 flex-1">
-              {/* <motion.div
-                variants={{
-                  hidden: { width: "80px", height: "80px" },
-                  visible: {
-                    width: "0px",
-                    height: "0px",
-                  },
-                }}
-                transition={{
-                  type: "spring",
-                  duration: 0.5,
-                  stiffness: 120,
-                  damping: 20,
-                }}
-                className="inline-block"
-              >
-                <Image
-                  src={service.url}
-                  alt={service.title}
-                  width={100}
-                  height={100}
-                  className={cn(
-                    "relative object-contain",
-                    service.imageClassName
-                  )}
-                />
-              </motion.div> */}
-
               <motion.h3
                 variants={{
                   hidden: { fontSize: "1.5rem" },
@@ -106,22 +76,6 @@ export default function Services({ className }) {
                 {service.description}
               </motion.p>
             </div>
-            <Link
-              href="https://thepvhub.com"
-              // variants={{
-              //   hidden: { opacity: 1, scale: 1 },
-              //   visible: { opacity: 0, scale: 0 },
-              // }}
-              // transition={{
-              //   type: "spring",
-              //   duration: 0.5,
-              //   stiffness: 120,
-              //   damping: 20,
-              // }}
-              className="flex gap-2 items-center text-sm text-gray-500 hover:text-blue-500"
-            >
-              More <ChevronRight size={19} />
-            </Link>
           </motion.div>
         ))}
       </div>
