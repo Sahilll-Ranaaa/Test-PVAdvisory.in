@@ -15,7 +15,7 @@ export default function KnowYourBusinessPage() {
               Know Your <span className="text-[#9f0202]">Business</span>
             </h1>
             <p className="text-xl text-gray-500 max-w-2xl mx-auto">
-              A comprehensive assessment tool to help you understand your business's financial and operational health.
+              A comprehensive assessment tool to help you understand your business&apos;s financial and operational health.
             </p>
           </div>
           <SurveySection />

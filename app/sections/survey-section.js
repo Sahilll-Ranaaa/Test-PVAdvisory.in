@@ -244,7 +244,7 @@ export default function SurveySection({ preselectedType = null, isStandalone = f
             {step === 100 && (
               <motion.div key="step-100" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4 py-2">
                 <div className="text-center space-y-1">
-                  <h2 className="text-xl font-bold text-gray-900">You're almost there!</h2>
+                  <h2 className="text-xl font-bold text-gray-900">You&apos;re almost there!</h2>
                   <p className="text-xs text-gray-500 max-w-xs mx-auto leading-relaxed">Fill in your details to generate your detailed business health report.</p>
                 </div>
                 <form onSubmit={handleSubmit(handleFinalSubmit)} className="space-y-3">
