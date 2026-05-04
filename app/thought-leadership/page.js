@@ -35,8 +35,7 @@ export default function ThoughtLeadershipPage() {
   const totalPages = Math.ceil(filteredBlogs.length / blogsPerPage);
   const currentBlogs = filteredBlogs.slice((currentPage - 1) * blogsPerPage, currentPage * blogsPerPage);
 
-  const featuredBlogs = allBlogs.slice(0, 3);
-  const latestBlogs = allBlogs.slice(3, 6);
+  const featuredBlogs = allBlogs.slice(0, 6);
 
   return (
     <div className="min-h-screen bg-[#fafafa] pt-32 pb-24">
@@ -103,29 +102,6 @@ export default function ThoughtLeadershipPage() {
               </div>
             </div>
 
-            {/* Latest List */}
-            <div className="space-y-6">
-              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 pb-4 border-b border-gray-100">Latest</h3>
-              <div className="space-y-5">
-                {latestBlogs.map((blog) => (
-                  <Link key={blog.id} href={`/thought-leadership/post?id=${blog.id}`} className="flex gap-4 group">
-                    <div className="relative w-16 h-16 shrink-0 rounded-xl overflow-hidden shadow-sm">
-                      {blog.image ? (
-                        <Image src={blog.image} alt={blog.title} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
-                      ) : (
-                        <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-300 font-bold">PVA</div>
-                      )}
-                    </div>
-                    <div className="space-y-0.5">
-                      <p className="text-[9px] text-gray-400 font-bold uppercase tracking-tight">{blog.date}</p>
-                      <h4 className="text-xs font-bold text-gray-900 group-hover:text-[#9f0202] transition-colors line-clamp-2 leading-snug">
-                        {blog.title}
-                      </h4>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
           </aside>
 
           {/* Main Feed Section (NOW ON RIGHT, 3 CARDS IN A ROW) */}

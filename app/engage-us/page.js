@@ -1,6 +1,10 @@
 import { Send } from "lucide-react";
-import EngageUsForm from "./engage-us-form";
+import dynamic from "next/dynamic";
 import Link from "next/link";
+
+const EngageUsForm = dynamic(() => import("./engage-us-form"), {
+  ssr: false,
+});
 
 export default function EngageUs() {
   return (
