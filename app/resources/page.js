@@ -3,17 +3,17 @@
 import { useState, useMemo, useEffect } from "react";
 import MaxWidthWrapper from "@/components/max-width-wrapper";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  FileText, 
-  Download, 
-  ShieldCheck, 
-  Zap, 
-  BarChart, 
-  BookOpen, 
-  Search, 
-  Filter, 
-  ArrowRight, 
-  ChevronRight, 
+import {
+  FileText,
+  Download,
+  ShieldCheck,
+  Zap,
+  BarChart,
+  BookOpen,
+  Search,
+  Filter,
+  ArrowRight,
+  ChevronRight,
   X,
   User,
   Mail,
@@ -102,6 +102,56 @@ const STATIC_RESOURCES = [
     category: "Business life",
     designedFor: "Freelancers",
     featured: false
+  },
+  {
+    title: "Quarterly Tax Planner",
+    description: "Proactively manage your tax liabilities with our quarterly planning tool.",
+    icon: <FileText size={28} />,
+    type: "Template",
+    size: "1.1 MB",
+    category: "Compliance",
+    designedFor: "Small businesses",
+    featured: false
+  },
+  {
+    title: "Startup Equity Guide",
+    description: "Everything you need to know about cap tables and equity distribution for founders.",
+    icon: <FileText size={28} />,
+    type: "E-Book",
+    size: "4.2 MB",
+    category: "Strategy",
+    designedFor: "Entrepreneurs",
+    featured: false
+  },
+  {
+    title: "Inventory Audit Manual",
+    description: "A comprehensive guide to conducting internal inventory audits effectively.",
+    icon: <FileText size={28} />,
+    type: "PDF Guide",
+    size: "1.8 MB",
+    category: "Operations",
+    designedFor: "Medium-sized businesses",
+    featured: false
+  },
+  {
+    title: "Digital Transformation Roadmap",
+    description: "Strategy for migrating legacy finance processes to modern cloud-based solutions.",
+    icon: <FileText size={28} />,
+    type: "Whitepaper",
+    size: "2.9 MB",
+    category: "Technology",
+    designedFor: "CFOs",
+    featured: false
+  },
+  {
+    title: "Payroll Processing Checklist",
+    description: "Ensure error-free monthly payroll processing with our detailed checklist.",
+    icon: <FileText size={28} />,
+    type: "Checklist",
+    size: "400 KB",
+    category: "Operations",
+    designedFor: "HR Managers",
+    featured: false
   }
 ];
 
@@ -115,38 +165,47 @@ export default function ResourcesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
   const [allResources, setAllResources] = useState(STATIC_RESOURCES);
-  
+
   // Lead Gate State
   const [selectedResource, setSelectedResource] = useState(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
+
   const { register, handleSubmit, formState: { errors }, reset } = useForm({
     resolver: zodResolver(formSchema),
   });
 
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, activeCategory]);
+
   useEffect(() => {
     const custom = getCustomResources().map(r => ({
       ...r,
-      icon: <FileText size={28} />, 
+      icon: <FileText size={28} />,
     }));
     setAllResources([...custom, ...STATIC_RESOURCES]);
   }, []);
 
   const filteredResources = useMemo(() => {
     return allResources.filter(resource => {
-      const matchesSearch = resource.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          resource.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        resource.description.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = activeCategory === "All" || resource.category === activeCategory;
       return matchesSearch && matchesCategory;
     });
   }, [searchQuery, activeCategory, allResources]);
 
-  const featuredResources = useMemo(() => {
-    const customFeatured = allResources.filter(r => r.id?.toString().startsWith('local-') && r.featured);
-    const staticFeatured = STATIC_RESOURCES.filter(r => r.featured);
-    return [...customFeatured, ...staticFeatured].slice(0, 2);
-  }, [allResources]);
+  const paginatedResources = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredResources.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredResources, currentPage]);
+
+  const totalPages = Math.ceil(filteredResources.length / ITEMS_PER_PAGE);
 
   const handleDownloadClick = (resource) => {
     setSelectedResource(resource);
@@ -177,7 +236,7 @@ export default function ResourcesPage() {
 
   const onLeadSubmit = async (data) => {
     setIsGenerating(true);
-    
+
     // Simulate generation delay to match survey experience
     await new Promise(r => setTimeout(r, 1500));
 
@@ -199,7 +258,7 @@ export default function ResourcesPage() {
 
   return (
     <div className="min-h-screen bg-[#fafafa]">
-      
+
       {/* COMPACT HERO HEADER */}
       <section className="relative pt-24 pb-10 bg-white border-b border-gray-100 overflow-hidden">
         <div className="absolute top-0 right-0 w-1/2 h-full bg-[#9f0202]/[0.02] -skew-x-12 transform origin-top" />
@@ -224,17 +283,17 @@ export default function ResourcesPage() {
         </MaxWidthWrapper>
       </section>
 
-      <MaxWidthWrapper className="py-12">
+      <MaxWidthWrapper className="py-12 max-w-[920px]">
         <div className="flex flex-col lg:flex-row gap-12">
-          
+
           {/* LEFT SIDEBAR */}
           <aside className="w-full lg:w-1/4 space-y-10">
             <div className="space-y-4">
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Search</h3>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                <Input 
-                  placeholder="Find a tool or guide..." 
+                <Input
+                  placeholder="Find a tool or guide..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10 h-12 bg-white border-gray-200 rounded-xl focus:ring-[#9f0202] text-sm shadow-sm"
@@ -254,8 +313,8 @@ export default function ResourcesPage() {
                     onClick={() => setActiveCategory(category)}
                     className={cn(
                       "text-left px-3 py-2.5 text-sm rounded-xl transition-all flex items-center justify-between group",
-                      activeCategory === category 
-                        ? "bg-[#9f0202] text-white font-bold shadow-md shadow-[#9f0202]/10" 
+                      activeCategory === category
+                        ? "bg-[#9f0202] text-white font-bold shadow-md shadow-[#9f0202]/10"
                         : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                     )}
                   >
@@ -270,103 +329,93 @@ export default function ResourcesPage() {
 
           {/* MAIN CONTENT AREA */}
           <main className="flex-1 space-y-12">
-            
-            {/* Featured Section */}
-            {featuredResources.length > 0 && activeCategory === "All" && !searchQuery && (
-              <div className="space-y-6">
-                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                  <div className="w-1.5 h-6 bg-[#9f0202] rounded-full" />
-                  Featured frameworks
-                </h2>
-                <div className="grid grid-cols-1 gap-6">
-                  {featuredResources.map((resource) => (
-                    <motion.div 
-                      key={resource.id || resource.title}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      whileHover={{ scale: 1.01, y: -4 }}
-                      className="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm hover:shadow-2xl transition-all duration-500 group flex flex-col md:flex-row gap-8 relative overflow-hidden"
-                    >
-                      <div className="absolute top-0 right-0 w-32 h-full bg-[#9f0202]/[0.01] -skew-x-12" />
-                      <div className="w-16 h-16 shrink-0 bg-[#9f0202]/5 rounded-2xl flex items-center justify-center text-[#9f0202] group-hover:scale-110 transition-transform duration-500">
-                        {resource.icon}
-                      </div>
-                      <div className="flex-1 space-y-6">
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-3">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#9f0202]">{resource.category}</span>
-                            <div className="w-1 h-1 bg-gray-200 rounded-full" />
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{resource.type}</span>
-                          </div>
-                          <h3 className="text-2xl font-bold text-gray-900 group-hover:text-[#9f0202] transition-colors">{resource.title}</h3>
-                          <p className="text-gray-500 leading-relaxed text-sm max-w-xl">
-                            {resource.description}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-4 pt-4 border-t border-gray-50">
-                          <Button 
-                            onClick={() => handleDownloadClick(resource)}
-                            className="bg-[#9f0202] hover:bg-[#7a0101] text-white rounded-xl px-6 h-11 font-bold shadow-lg shadow-[#9f0202]/10 transition-all"
-                          >
-                            Download <Download className="ml-2 h-4 w-4" />
-                          </Button>
-                          <span className="text-[10px] font-bold text-gray-300 uppercase">{resource.size}</span>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            )}
+
 
             {/* Regular Grid */}
-            <div className="space-y-6">
-              <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                <div className="w-1.5 h-6 bg-gray-200 rounded-full" />
-                Library grid
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <AnimatePresence mode="popLayout">
-                  {filteredResources.filter(r => !featuredResources.find(fr => (fr.id === r.id && r.id) || (fr.title === r.title && !r.id))).map((resource) => (
-                    <motion.div 
+                  {paginatedResources.map((resource) => (
+                    <motion.div
                       layout
                       key={resource.id || resource.title}
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.95 }}
-                      whileHover={{ scale: 1.02, y: -5 }}
-                      className="bg-white rounded-[1.5rem] border border-gray-100 p-7 hover:shadow-2xl transition-all duration-300 group"
+                      whileHover={{ scale: 1.05, y: -8 }}
+                      onClick={() => handleDownloadClick(resource)}
+                      className="bg-white rounded-[2rem] border border-gray-100 p-8 hover:shadow-3xl transition-all duration-500 group relative overflow-hidden flex flex-col min-h-[340px] cursor-pointer"
                     >
-                      <div className="flex flex-col h-full space-y-6">
+                      {/* Soft Maroon Effect from Bottom Right */}
+                      <div className="absolute -bottom-20 -right-20 w-72 h-72 bg-[#9f0202]/[0.12] group-hover:bg-[#9f0202]/[0.2] blur-[80px] rounded-full transition-all duration-500 pointer-events-none" />
+
+                      {/* Wavy Background Effect */}
+                      <div className="absolute top-0 right-0 w-full h-32 opacity-[0.15] group-hover:opacity-[0.25] transition-opacity pointer-events-none">
+                        <svg width="100%" height="100%" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M0 50 C 50 20, 100 80, 150 50 C 200 20, 250 80, 300 50 C 350 20, 400 80, 450 50" stroke="#9f0202" fill="transparent" strokeWidth="1.5" />
+                          <path d="M0 70 C 50 40, 100 100, 150 70 C 200 40, 250 100, 300 70 C 350 40, 400 100, 450 70" stroke="#9f0202" fill="transparent" strokeWidth="1.5" />
+                          <path d="M0 90 C 50 60, 100 120, 150 90 C 200 60, 250 120, 300 90 C 350 60, 400 120, 450 90" stroke="#9f0202" fill="transparent" strokeWidth="1.5" />
+                          <path d="M0 110 C 50 80, 100 140, 150 110 C 200 80, 250 140, 300 110 C 350 80, 400 140, 450 110" stroke="#9f0202" fill="transparent" strokeWidth="1.5" />
+                        </svg>
+                      </div>
+
+                      <div className="flex flex-col h-full space-y-7 relative z-10">
                         <div className="flex justify-between items-start">
-                          <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-[#9f0202] group-hover:scale-110 transition-transform duration-300">
-                            {resource.icon}
+                          <div className="w-[54px] h-[54px] bg-white shadow-sm border border-gray-50 rounded-2xl flex items-center justify-center p-2.5 group-hover:scale-110 transition-transform duration-500">
+                            <img src="/pv-logo.png" alt="PV Logo" className="w-full h-full object-contain" />
                           </div>
-                          <span className="text-[9px] font-bold text-gray-300 uppercase tracking-widest">{resource.size}</span>
-                        </div>
-                        
-                        <div className="space-y-3 flex-1">
-                          <span className="text-[9px] font-bold text-[#9f0202] uppercase tracking-widest">{resource.category}</span>
-                          <h3 className="text-lg font-bold text-gray-900 group-hover:text-[#9f0202] transition-colors leading-tight">{resource.title}</h3>
-                          <p className="text-gray-500 text-xs leading-relaxed line-clamp-2">
-                            {resource.description}
-                          </p>
                         </div>
 
-                        <div className="pt-5 border-t border-gray-50 flex items-center justify-between">
-                           <span className="text-[9px] font-bold text-gray-400">{resource.type}</span>
-                           <Button 
-                             onClick={() => handleDownloadClick(resource)}
-                             variant="ghost" className="p-0 h-auto text-[#9f0202] hover:bg-transparent font-bold text-xs group/btn"
-                           >
-                             Access Asset <ArrowRight className="ml-1 h-3 w-3 group-hover/btn:translate-x-1 transition-transform" />
-                           </Button>
+                        <div className="space-y-4 flex-1">
+                          <span className="text-[11px] font-bold text-[#9f0202] uppercase tracking-[0.2em]">{resource.category}</span>
+                          <h3 className="text-2xl font-bold text-gray-900 group-hover:text-[#9f0202] transition-colors leading-tight">{resource.title}</h3>
+                          <p className="text-gray-500 text-sm leading-relaxed line-clamp-3">
+                            {resource.description}
+                          </p>
                         </div>
                       </div>
                     </motion.div>
                   ))}
                 </AnimatePresence>
               </div>
+
+              {/* Pagination UI */}
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-2 pt-12">
+                  <Button
+                    variant="outline"
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                    className="rounded-xl h-10 px-4 border-gray-200 text-gray-600 hover:text-[#9f0202] hover:border-[#9f0202] disabled:opacity-50"
+                  >
+                    Previous
+                  </Button>
+                  <div className="flex items-center gap-1">
+                    {[...Array(totalPages)].map((_, i) => (
+                      <button
+                        key={i + 1}
+                        onClick={() => setCurrentPage(i + 1)}
+                        className={cn(
+                          "w-10 h-10 rounded-xl text-sm font-bold transition-all",
+                          currentPage === i + 1
+                            ? "bg-[#9f0202] text-white shadow-lg shadow-[#9f0202]/20"
+                            : "text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                        )}
+                      >
+                        {i + 1}
+                      </button>
+                    ))}
+                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                    className="rounded-xl h-10 px-4 border-gray-200 text-gray-600 hover:text-[#9f0202] hover:border-[#9f0202] disabled:opacity-50"
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
             </div>
           </main>
         </div>
@@ -376,7 +425,7 @@ export default function ResourcesPage() {
       <AnimatePresence>
         {selectedResource && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -387,67 +436,114 @@ export default function ResourcesPage() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-md bg-white rounded-xl shadow-2xl overflow-hidden"
+              className="relative w-full max-w-3xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row"
             >
-              <div className="p-6 md:p-8">
+              {/* Left Column: Card Preview (Dark Theme) */}
+              {!isSuccess && (
+                <div className="w-full md:w-[42%] bg-[#0f1115] p-10 relative overflow-hidden flex flex-col justify-between min-h-[420px]">
+                  {/* Premium Wavy Background */}
+                  <div className="absolute inset-0 opacity-20 pointer-events-none scale-150 origin-top-right">
+                    <svg width="100%" height="100%" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                      {[...Array(15)].map((_, i) => (
+                        <path 
+                          key={i}
+                          d={`M0 ${100 + i * 15} C 100 ${50 + i * 15}, 200 ${150 + i * 15}, 400 ${100 + i * 15}`} 
+                          stroke="#9f0202" 
+                          fill="transparent" 
+                          strokeWidth="1" 
+                        />
+                      ))}
+                    </svg>
+                  </div>
+
+                  <div className="relative z-10 space-y-6">
+                    <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center p-2.5 shadow-lg shadow-black/20">
+                      <img src="/pv-logo.png" alt="PV Logo" className="w-full h-full object-contain" />
+                    </div>
+                    <div className="space-y-3">
+                      <span className="text-[10px] font-bold text-[#9f0202] uppercase tracking-[0.3em]">{selectedResource.category}</span>
+                      <h2 className="text-2xl md:text-3xl font-bold text-white leading-tight">{selectedResource.title}</h2>
+                      <p className="text-gray-400 text-xs leading-relaxed line-clamp-4">{selectedResource.description}</p>
+                    </div>
+                  </div>
+
+                  <div className="relative z-10" />
+                </div>
+              )}
+
+              {/* Right Column: Form / Success State */}
+              <div className={cn(
+                "flex-1 p-8 md:p-12 flex flex-col justify-center bg-white",
+                isSuccess && "w-full"
+              )}>
                 {!isSuccess ? (
                   <div className="space-y-6">
-                    <div className="text-center space-y-2">
-                       <h2 className="text-xl font-bold text-gray-900">You&apos;re almost there!</h2>
-                       <p className="text-xs text-gray-500 max-w-xs mx-auto leading-relaxed">Fill in your details to access <span className="font-bold text-gray-900">&quot;{selectedResource.title}&quot;</span></p>
+                    <div className="space-y-1">
+                       <h2 className="text-xl font-bold text-gray-900 tracking-tight uppercase">Download Resource</h2>
+                       <p className="text-xs text-gray-400 leading-relaxed">Please provide your professional details to receive the asset immediately.</p>
                     </div>
 
                     <form onSubmit={handleSubmit(onLeadSubmit)} className="space-y-4">
                       <div className="space-y-1.5">
-                        <Label className="text-[9px] text-gray-600 font-bold uppercase tracking-widest ml-1">Full Name*</Label>
-                        <Input {...register("name")} className="bg-gray-50 border-transparent h-10 rounded-lg focus:border-[#9f0202] text-sm px-4" placeholder="Enter your name" />
-                        {errors.name && <p className="text-[9px] text-red-500 ml-1">{errors.name.message}</p>}
+                        <Label className="text-[9px] text-gray-400 font-bold uppercase tracking-widest ml-1">Full Name</Label>
+                        <Input {...register("name")} className="bg-gray-50 border-gray-100 h-11 rounded-xl focus:border-[#9f0202] text-sm px-4" placeholder="Your Name" />
+                        {errors.name && <p className="text-[9px] text-red-500 ml-1 font-medium">{errors.name.message}</p>}
                       </div>
 
                       <div className="space-y-1.5">
-                        <Label className="text-[9px] text-gray-600 font-bold uppercase tracking-widest ml-1">Business Email*</Label>
-                        <Input {...register("email")} className="bg-gray-50 border-transparent h-10 rounded-lg focus:border-[#9f0202] text-sm px-4" placeholder="name@company.com" />
-                        {errors.email && <p className="text-[9px] text-red-500 ml-1">{errors.email.message}</p>}
+                        <Label className="text-[9px] text-gray-400 font-bold uppercase tracking-widest ml-1">Business Email</Label>
+                        <Input {...register("email")} className="bg-gray-50 border-gray-100 h-11 rounded-xl focus:border-[#9f0202] text-sm px-4" placeholder="name@company.com" />
+                        {errors.email && <p className="text-[9px] text-red-500 ml-1 font-medium">{errors.email.message}</p>}
                       </div>
 
                       <div className="space-y-1.5">
-                        <Label className="text-[9px] text-gray-600 font-bold uppercase tracking-widest ml-1">Mobile Number*</Label>
-                        <Input {...register("mobile")} className="bg-gray-50 border-transparent h-10 rounded-lg focus:border-[#9f0202] text-sm px-4" placeholder="+91" />
-                        {errors.mobile && <p className="text-[9px] text-red-500 ml-1">{errors.mobile.message}</p>}
+                        <Label className="text-[9px] text-gray-400 font-bold uppercase tracking-widest ml-1">Mobile Number</Label>
+                        <Input {...register("mobile")} className="bg-gray-50 border-gray-100 h-11 rounded-xl focus:border-[#9f0202] text-sm px-4" placeholder="+91" />
+                        {errors.mobile && <p className="text-[9px] text-red-500 ml-1 font-medium">{errors.mobile.message}</p>}
                       </div>
 
-                      <div className="flex items-center gap-3 pt-3">
-                        <Button type="button" onClick={() => setSelectedResource(null)} variant="ghost" className="text-gray-400 h-10 px-4 text-xs">Cancel</Button>
-                        <Button type="submit" disabled={isGenerating} className="flex-1 bg-[#9f0202] hover:bg-[#7a0101] text-white h-10 font-bold rounded-lg text-sm shadow-lg shadow-[#9f0202]/10">
-                          {isGenerating ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : <Download className="mr-2 h-4 w-4" />}
-                          {isGenerating ? "Processing..." : "Get Detailed Resource"}
+                      <div className="flex flex-col gap-3 pt-2">
+                        <Button type="submit" disabled={isGenerating} className="w-full bg-[#9f0202] hover:bg-[#7a0101] text-white h-12 font-bold rounded-xl text-sm shadow-xl shadow-[#9f0202]/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+                          {isGenerating ? <Loader2 className="animate-spin h-4 w-4" /> : <Download className="h-4 w-4" />}
+                          {isGenerating ? "Processing..." : "Get Started Now"}
                         </Button>
+                        <button type="button" onClick={() => setSelectedResource(null)} className="text-gray-400 hover:text-gray-600 text-[10px] font-medium transition-colors">
+                          Maybe later, take me back
+                        </button>
                       </div>
                     </form>
                   </div>
                 ) : (
-                  <div className="py-8 text-center space-y-6">
+                  <div className="py-8 text-center space-y-6 max-w-xs mx-auto">
                     <motion.div 
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="w-14 h-14 bg-green-50 rounded-full flex items-center justify-center text-green-600 mx-auto"
+                      className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center text-green-600 mx-auto"
                     >
                       <CheckCircle2 size={32} />
                     </motion.div>
-                    <div className="space-y-1">
+                    <div className="space-y-2">
                        <h2 className="text-xl font-bold text-gray-900">Success!</h2>
-                       <p className="text-xs text-gray-500">Your resource is now downloading.</p>
+                       <p className="text-xs text-gray-500 leading-relaxed">Your download for <span className="font-bold text-gray-900">"{selectedResource.title}"</span> has started.</p>
                     </div>
                     <Button 
                       variant="outline" 
                       onClick={() => setSelectedResource(null)}
-                      className="border-gray-200 text-gray-500 h-9 px-6 rounded-lg text-xs hover:bg-gray-50"
+                      className="border-gray-200 text-gray-600 h-11 px-6 rounded-xl text-xs font-bold hover:bg-gray-50 w-full"
                     >
                       Back to Library
                     </Button>
                   </div>
                 )}
               </div>
+              
+              {/* Close Button */}
+              <button 
+                onClick={() => setSelectedResource(null)}
+                className="absolute top-5 right-5 p-2 text-gray-400 hover:text-gray-900 transition-colors z-20"
+              >
+                <X size={20} />
+              </button>
             </motion.div>
           </div>
         )}
