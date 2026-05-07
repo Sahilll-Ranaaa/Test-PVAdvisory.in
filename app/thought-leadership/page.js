@@ -48,12 +48,8 @@ export default function ThoughtLeadershipPage() {
   const totalPages = Math.ceil(filteredBlogs.length / blogsPerPage);
   const currentBlogs = filteredBlogs.slice((currentPage - 1) * blogsPerPage, currentPage * blogsPerPage);
 
-<<<<<<< HEAD
   // Get up to 6 featured blogs for the sidebar
   const featuredBlogs = allBlogs.filter(b => b.is_featured).slice(0, 6);
-=======
-  const featuredBlogs = allBlogs.slice(0, 6);
->>>>>>> 335a43b3608bfa3ea417469e77b65dd2246a57bc
 
   return (
     <div className="min-h-screen bg-[#fafafa] pt-24 pb-16">
@@ -117,15 +113,9 @@ export default function ThoughtLeadershipPage() {
                     </div>
                   </Link>
                 ))}
-<<<<<<< HEAD
                 {featuredBlogs.length === 0 && <p className="text-[10px] text-gray-400 italic">No featured insights yet.</p>}
               </div>
             </div>
-=======
-              </div>
-            </div>
-
->>>>>>> 335a43b3608bfa3ea417469e77b65dd2246a57bc
           </aside>
 
           {/* Main Feed Section (NOW ON RIGHT, 3 CARDS IN A ROW) */}
