@@ -1,5 +1,3 @@
-
-
 import dynamic from "next/dynamic";
 
 const AssessmentClient = dynamic(() => import("@/components/assessment/assessment-client"), {

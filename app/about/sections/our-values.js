@@ -23,7 +23,7 @@ export default function OurValuesSection() {
           {/* Left Intro */}
           <div className="lg:col-span-1">
             <p className="text-gray-500 text-[15px] leading-[1.8]">
-              These six core values aren't aspirations — they're the standards we hold ourselves to every day, in every engagement, with every client and team member.
+              These six core values aren&apos;t aspirations &mdash; they&apos;re the standards we hold ourselves to every day, in every engagement, with every client and team member.
             </p>
           </div>
 

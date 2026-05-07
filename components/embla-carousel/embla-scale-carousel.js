@@ -89,7 +89,7 @@ const EmblaCarousel = (props) => {
       .on("reInit", tweenScale)
       .on("scroll", tweenScale)
       .on("slideFocus", tweenScale);
-  }, [emblaApi, tweenScale]);
+  }, [emblaApi, tweenScale, setTweenNodes, setTweenFactor]);
 
   return (
     <div className="max-w-[48rem] m-auto [--slide-height:19rem] [--slide-spacing:1rem] [--slide-size:69%]  relative space-y-5">
