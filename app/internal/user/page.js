@@ -46,8 +46,11 @@ export default function AdminPage() {
   const [blogs, setBlogs] = useState([]);
   const [resources, setResources] = useState([]);
   const [leads, setLeads] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isLoadingLeads, setIsLoadingLeads] = useState(true);
+  
+  // Lead Filtering State
+  const [leadSearch, setLeadSearch] = useState("");
+  const [leadFilter, setLeadFilter] = useState("all");
   
   const router = useRouter();
 
@@ -106,6 +109,21 @@ export default function AdminPage() {
       setIsLoadingLeads(false);
     }
   };
+
+  const filteredLeads = useMemo(() => {
+    return leads.filter(lead => {
+      const matchesSearch = 
+        (lead.name?.toLowerCase().includes(leadSearch.toLowerCase())) ||
+        (lead.email?.toLowerCase().includes(leadSearch.toLowerCase())) ||
+        (lead.mobile?.includes(leadSearch));
+      
+      const matchesFilter = 
+        leadFilter === "all" || 
+        lead.activity_type?.toLowerCase().includes(leadFilter.toLowerCase());
+
+      return matchesSearch && matchesFilter;
+    });
+  }, [leads, leadSearch, leadFilter]);
 
   useEffect(() => {
     checkAuth();
@@ -232,7 +250,7 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="flex h-screen bg-[#fafafa]">
+    <div className="flex h-screen bg-[#fafafa] font-poppins">
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-gray-100 flex flex-col shrink-0">
         <div className="p-8 pb-4">
@@ -262,20 +280,13 @@ export default function AdminPage() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto p-12">
+      <main className="flex-1 overflow-y-auto pt-28 px-12 pb-12">
         <div className="max-w-6xl mx-auto">
           {activeTab === "dashboard" && (
             <div className="space-y-12">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-3xl font-bold text-gray-900">Welcome back, Admin</h1>
-                  <p className="text-gray-400 font-medium">Here&apos;s what&apos;s happening with your platform.</p>
-                </div>
-                <div className="flex gap-4">
-                  <Button onClick={() => { setEditingId(null); setBlogForm({ title: "", description: "", content: "", category: "Strategy", image_url: "", is_published: true, is_featured: false }); setActiveTab("add-blog"); }} className="bg-[#9f0202] hover:bg-[#7a0101] text-white rounded-xl px-6 font-bold shadow-lg shadow-[#9f0202]/10">
-                    <Plus className="mr-2" size={18} /> Create Post
-                  </Button>
-                </div>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">Welcome back, Admin</h1>
+                <p className="text-gray-400 font-medium">Here&apos;s what&apos;s happening with your platform.</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -305,59 +316,59 @@ export default function AdminPage() {
           )}
 
           {activeTab === "add-blog" && (
-            <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="flex items-center gap-4">
-                <button onClick={() => setActiveTab("blogs")} className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-all">
-                  <ChevronLeft size={20} />
+                <button onClick={() => setActiveTab("blogs")} className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-all">
+                  <ChevronLeft size={18} />
                 </button>
-                <h2 className="text-2xl font-bold text-gray-900">{editingId ? "Edit Blog Post" : "Create New Post"}</h2>
+                <h2 className="text-xl font-bold text-gray-900">{editingId ? "Edit Blog Post" : "Create New Post"}</h2>
               </div>
 
-              <div className="bg-white rounded-[2.5rem] border border-gray-100 p-10 space-y-8 shadow-sm">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="bg-white rounded-[2rem] border border-gray-100 p-8 space-y-6 shadow-sm">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Post Title</Label>
-                      <Input value={blogForm.title} onChange={e => setBlogForm({ ...blogForm, title: e.target.value })} placeholder="Enter a catchy title..." className="h-14 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:border-[#9f0202] text-lg font-bold" />
+                    <div className="space-y-1.5">
+                      <Label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Post Title</Label>
+                      <Input value={blogForm.title} onChange={e => setBlogForm({ ...blogForm, title: e.target.value })} placeholder="Enter a catchy title..." className="h-12 rounded-xl bg-gray-50 border-transparent focus:bg-white focus:border-[#9f0202] text-base font-bold" />
                     </div>
-                    <div className="space-y-2">
-                      <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Short Description</Label>
-                      <Textarea value={blogForm.description} onChange={e => setBlogForm({ ...blogForm, description: e.target.value })} placeholder="A brief summary for the card..." className="rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:border-[#9f0202] min-h-[100px]" />
+                    <div className="space-y-1.5">
+                      <Label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Short Description</Label>
+                      <Textarea value={blogForm.description} onChange={e => setBlogForm({ ...blogForm, description: e.target.value })} placeholder="A brief summary..." className="rounded-xl bg-gray-50 border-transparent focus:bg-white focus:border-[#9f0202] min-h-[80px] text-sm" />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                       <div className="space-y-2">
-                         <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Category</Label>
-                         <select value={blogForm.category} onChange={e => setBlogForm({ ...blogForm, category: e.target.value })} className="w-full h-12 rounded-xl bg-gray-50 border-transparent px-4 text-sm font-medium">
+                       <div className="space-y-1.5">
+                         <Label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Category</Label>
+                         <select value={blogForm.category} onChange={e => setBlogForm({ ...blogForm, category: e.target.value })} className="w-full h-10 rounded-lg bg-gray-50 border-transparent px-3 text-xs font-medium">
                            {["Strategy", "Operations", "Compliance", "Insights", "Finance"].map(c => <option key={c} value={c}>{c}</option>)}
                          </select>
                        </div>
-                       <div className="flex items-center gap-6 pt-8 px-2">
+                       <div className="flex items-center gap-4 pt-6 px-1">
                           <label className="flex items-center gap-2 cursor-pointer group">
-                             <input type="checkbox" checked={blogForm.is_featured} onChange={e => setBlogForm({ ...blogForm, is_featured: e.target.checked })} className="w-4 h-4 rounded border-gray-300 text-[#9f0202] focus:ring-[#9f0202]" />
-                             <span className="text-xs font-bold text-gray-500 group-hover:text-gray-900 transition-colors uppercase tracking-widest">Featured</span>
+                             <input type="checkbox" checked={blogForm.is_featured} onChange={e => setBlogForm({ ...blogForm, is_featured: e.target.checked })} className="w-3.5 h-3.5 rounded border-gray-300 text-[#9f0202] focus:ring-[#9f0202]" />
+                             <span className="text-[10px] font-bold text-gray-500 group-hover:text-gray-900 transition-colors uppercase tracking-widest">Featured</span>
                           </label>
                           <label className="flex items-center gap-2 cursor-pointer group">
-                             <input type="checkbox" checked={blogForm.is_published} onChange={e => setBlogForm({ ...blogForm, is_published: e.target.checked })} className="w-4 h-4 rounded border-gray-300 text-[#9f0202] focus:ring-[#9f0202]" />
-                             <span className="text-xs font-bold text-gray-500 group-hover:text-gray-900 transition-colors uppercase tracking-widest">Published</span>
+                             <input type="checkbox" checked={blogForm.is_published} onChange={e => setBlogForm({ ...blogForm, is_published: e.target.checked })} className="w-3.5 h-3.5 rounded border-gray-300 text-[#9f0202] focus:ring-[#9f0202]" />
+                             <span className="text-[10px] font-bold text-gray-500 group-hover:text-gray-900 transition-colors uppercase tracking-widest">Published</span>
                           </label>
                        </div>
                     </div>
                   </div>
 
-                  <div className="space-y-4">
-                    <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Cover Image</Label>
-                    <div className="aspect-[16/10] bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center overflow-hidden relative group">
+                  <div className="space-y-3">
+                    <Label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Cover Image</Label>
+                    <div className="aspect-[16/10] bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center overflow-hidden relative group">
                       {blogForm.image_url ? (
                         <>
                           <Image src={blogForm.image_url} alt="Preview" width={400} height={250} className="w-full h-full object-cover" />
                           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all">
-                            <Button variant="outline" className="text-white border-white hover:bg-white hover:text-black rounded-full px-6" onClick={() => document.getElementById('blog-upload').click()}>Change Image</Button>
+                            <Button variant="outline" className="text-white border-white hover:bg-white hover:text-black rounded-full h-8 text-xs px-4" onClick={() => document.getElementById('blog-upload').click()}>Change Image</Button>
                           </div>
                         </>
                       ) : (
-                        <button onClick={() => document.getElementById('blog-upload').click()} className="flex flex-col items-center gap-3 text-gray-400 hover:text-[#9f0202] transition-colors">
-                          <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-sm"><Upload size={24} /></div>
-                          <span className="text-xs font-bold uppercase tracking-widest">Upload Banner</span>
+                        <button onClick={() => document.getElementById('blog-upload').click()} className="flex flex-col items-center gap-2 text-gray-400 hover:text-[#9f0202] transition-colors">
+                          <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm"><Upload size={20} /></div>
+                          <span className="text-[10px] font-bold uppercase tracking-widest">Upload Banner</span>
                         </button>
                       )}
                       <input id="blog-upload" type="file" className="hidden" onChange={e => handleFileUpload(e, 'blog')} accept="image/*" />
@@ -365,12 +376,12 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Post Content (HTML allowed)</Label>
-                  <Textarea value={blogForm.content} onChange={e => setBlogForm({ ...blogForm, content: e.target.value })} placeholder="Write your masterpiece here..." className="rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:border-[#9f0202] min-h-[400px] font-mono text-sm" />
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Post Content (HTML allowed)</Label>
+                  <Textarea value={blogForm.content} onChange={e => setBlogForm({ ...blogForm, content: e.target.value })} placeholder="Write your masterpiece here..." className="rounded-xl bg-gray-50 border-transparent focus:bg-white focus:border-[#9f0202] min-h-[300px] font-mono text-xs" />
                 </div>
                 
-                <Button onClick={handleSaveBlog} className="w-full h-14 bg-[#9f0202] hover:bg-[#7a0101] text-white font-bold rounded-2xl text-lg shadow-xl shadow-[#9f0202]/10">
+                <Button onClick={handleSaveBlog} className="w-full h-12 bg-[#9f0202] hover:bg-[#7a0101] text-white font-bold rounded-xl text-base shadow-lg shadow-[#9f0202]/10">
                   {editingId ? "Update Published Post" : "Publish to Thought Leadership"}
                 </Button>
               </div>
@@ -417,35 +428,81 @@ export default function AdminPage() {
 
           {activeTab === "leads" && (
             <div className="space-y-8 animate-in fade-in duration-500">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                 <h2 className="text-2xl font-bold text-gray-900">Captured Leads</h2>
-                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{leads.length} Total Leads</span>
+                <div className="flex flex-1 max-w-2xl gap-3 w-full">
+                   <div className="relative flex-1">
+                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                     <Input 
+                        placeholder="Search by name, email or mobile..." 
+                        value={leadSearch}
+                        onChange={(e) => setLeadSearch(e.target.value)}
+                        className="pl-10 h-10 rounded-xl bg-white border-gray-200 text-xs"
+                     />
+                   </div>
+                   <select 
+                      value={leadFilter}
+                      onChange={(e) => setLeadFilter(e.target.value)}
+                      className="h-10 rounded-xl bg-white border-gray-200 px-4 text-xs font-bold text-gray-500 outline-none focus:ring-1 focus:ring-[#9f0202]/20"
+                   >
+                      <option value="all">All Activities</option>
+                      <option value="Survey">Survey Assessments</option>
+                      <option value="Resource">Knowledge Repo</option>
+                   </select>
+                </div>
+                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{filteredLeads.length} Leads</span>
               </div>
 
               <div className="bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-sm">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
-                    <thead className="bg-gray-50/50 border-b border-gray-50">
+                    <thead className="bg-gray-50/50 border-b border-gray-50 text-[9px] font-black text-gray-400 uppercase tracking-widest">
                       <tr>
-                        <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Name \u0026 Company</th>
-                        <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Email \u0026 Mobile</th>
-                        <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Resource \u0026 Date</th>
+                        <th className="px-6 py-5 text-center w-12">#</th>
+                        <th className="px-8 py-5">User Details</th>
+                        <th className="px-8 py-5">Contact Info</th>
+                        <th className="px-8 py-5">Activity / Purpose</th>
+                        <th className="px-8 py-5 text-center">Report / File</th>
+                        <th className="px-8 py-5 text-right">Timestamp</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
-                      {leads.map(lead => (
+                      {filteredLeads.map((lead, index) => (
                         <tr key={lead.id} className="hover:bg-gray-50/50 transition-colors">
-                          <td className="px-8 py-6">
-                            <div className="font-bold text-gray-900">{lead.full_name || lead.name}</div>
-                            <div className="text-[11px] text-gray-400 font-medium">{lead.company} &bull; {lead.job_title}</div>
+                          <td className="px-6 py-6 text-center text-[10px] font-bold text-gray-300">
+                            {index + 1}
                           </td>
                           <td className="px-8 py-6">
-                            <div className="font-bold text-gray-900">{lead.email}</div>
-                            <div className="text-[11px] text-gray-400 font-medium">{lead.mobile}</div>
+                            <div className="font-bold text-gray-900">{lead.name}</div>
+                            {lead.metadata?.company && <div className="text-[10px] text-gray-400 font-medium">{lead.metadata.company}</div>}
                           </td>
                           <td className="px-8 py-6">
-                            <div className="font-bold text-[#9f0202]">{lead.resource_title || lead.resourceTitle || "Survey Completed"}</div>
-                            <div className="text-[11px] text-gray-400 font-medium">{new Date(lead.created_at || lead.timestamp).toLocaleDateString()}</div>
+                            <div className="font-bold text-gray-800 text-xs">{lead.email}</div>
+                            <div className="text-[10px] text-gray-400 font-medium mt-0.5">{lead.mobile}</div>
+                          </td>
+                          <td className="px-8 py-6">
+                            <div className="font-bold text-gray-900 text-xs">{lead.activity_title || "Untitled Activity"}</div>
+                            <div className="text-[10px] text-[#9f0202] font-black uppercase tracking-widest mt-1 opacity-70">{lead.activity_type}</div>
+                          </td>
+                          <td className="px-8 py-6 text-center">
+                            {lead.report_url ? (
+                              <a 
+                                href={lead.report_url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-600 rounded-lg text-[10px] font-bold hover:bg-green-100 transition-all"
+                              >
+                                <Download size={12} /> View Report
+                              </a>
+                            ) : lead.metadata?.source === 'Knowledge Repository' ? (
+                              <span className="text-[10px] font-bold text-gray-300 uppercase tracking-widest italic">Digital Resource</span>
+                            ) : (
+                              <span className="text-[10px] font-bold text-gray-300 uppercase tracking-widest italic">No File</span>
+                            )}
+                          </td>
+                          <td className="px-8 py-6 text-right">
+                            <div className="text-[11px] font-bold text-gray-900">{new Date(lead.created_at).toLocaleDateString()}</div>
+                            <div className="text-[9px] text-gray-400 font-medium">{new Date(lead.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                           </td>
                         </tr>
                       ))}
