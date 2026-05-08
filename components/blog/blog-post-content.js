@@ -59,7 +59,7 @@ export default function BlogPostContent({ blog }) {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="relative aspect-[21/9] rounded-3xl overflow-hidden mb-16 shadow-2xl"
+            className="relative aspect-[16/7] max-w-3xl ml-0 rounded-[2rem] overflow-hidden mb-12 shadow-2xl"
           >
             {blog.image_url ? (
               <Image 
