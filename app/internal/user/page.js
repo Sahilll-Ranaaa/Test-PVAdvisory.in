@@ -47,6 +47,7 @@ export default function AdminPage() {
   const [resources, setResources] = useState([]);
   const [leads, setLeads] = useState([]);
   const [isLoadingLeads, setIsLoadingLeads] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   
   // Lead Filtering State
   const [leadSearch, setLeadSearch] = useState("");
@@ -156,6 +157,7 @@ export default function AdminPage() {
       return;
     }
 
+    setIsSaving(true);
     try {
       let finalImageUrl = blogForm.image_url;
 
@@ -207,10 +209,13 @@ export default function AdminPage() {
       setBlogForm({ title: "", description: "", content: "", category: "Strategy", image_url: "", is_published: true, is_featured: false });
       setEditingId(null);
       refreshData();
-      alert(editingId ? "Post updated!" : "Post published!");
+      alert(editingId ? "Post updated successfully!" : "Post published successfully!");
+      setActiveTab("blogs");
     } catch (err) {
       console.error("Save blog failed:", err);
       alert("Error saving blog: " + err.message);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -378,11 +383,18 @@ export default function AdminPage() {
 
                 <div className="space-y-1.5">
                   <Label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Post Content (HTML allowed)</Label>
-                  <Textarea value={blogForm.content} onChange={e => setBlogForm({ ...blogForm, content: e.target.value })} placeholder="Write your masterpiece here..." className="rounded-xl bg-gray-50 border-transparent focus:bg-white focus:border-[#9f0202] min-h-[300px] font-mono text-xs" />
+                  <Textarea value={blogForm.content} onChange={e => setBlogForm({ ...blogForm, content: e.target.value })} placeholder="Write your masterpiece here..." className="rounded-xl bg-gray-50 border-transparent focus:bg-white focus:border-[#9f0202] min-h-[300px] font-poppins text-sm leading-relaxed" />
                 </div>
                 
-                <Button onClick={handleSaveBlog} className="w-full h-12 bg-[#9f0202] hover:bg-[#7a0101] text-white font-bold rounded-xl text-base shadow-lg shadow-[#9f0202]/10">
-                  {editingId ? "Update Published Post" : "Publish to Thought Leadership"}
+                <Button onClick={handleSaveBlog} disabled={isSaving} className="w-full h-12 bg-[#9f0202] hover:bg-[#7a0101] text-white font-bold rounded-xl text-base shadow-lg shadow-[#9f0202]/10">
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="animate-spin mr-2" size={18} />
+                      {editingId ? "Updating..." : "Publishing..."}
+                    </>
+                  ) : (
+                    editingId ? "Update Published Post" : "Publish to Thought Leadership"
+                  )}
                 </Button>
               </div>
             </div>

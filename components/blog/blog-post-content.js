@@ -79,9 +79,9 @@ export default function BlogPostContent({ blog }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="prose prose-lg prose-red max-w-none mb-20"
+            className="prose prose-lg prose-red max-w-none mb-20 font-poppins"
           >
-            <div className="text-gray-600 leading-relaxed text-lg" 
+            <div className="text-gray-800 leading-relaxed text-lg whitespace-pre-wrap" 
                  dangerouslySetInnerHTML={{ __html: blog.content }} 
             />
           </motion.div>
