@@ -12,18 +12,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { generateReport, generateInternalReport } from "@/lib/generate-report";
-import emailjs from "@emailjs/browser";
 import { saveLead } from "@/lib/admin-store";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { validateProfessionalEmail } from "@/lib/email-validator";
 import { supabase } from "@/lib/supabase";
 
-// --- CONFIGURATION FROM ENV ---
-const NOTIFICATION_EMAILS = process.env.NEXT_PUBLIC_SURVEY_NOTIFICATION_EMAIL || "sahil.rana@pvadvisory.in";
-const EMAILJS_SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || "service_hba1urj";
-const EMAILJS_TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || "template_veexuer";
-const EMAILJS_PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || "9Ano0XRctcKUCbMwC";
 // ---------------------
 
 const formSchema = z.object({
@@ -239,39 +233,7 @@ export default function SurveySection({ preselectedType = null, isStandalone = f
         qaText += `${i+1}. ${q.question}\n   Answer: ${selected ? selected.text : "Skipped"} (${score} pts)\n\n`;
       });
 
-      // 4. Prepare Email Parameters
-      const emailParams = {
-        name: data.name,
-        user_email: data.email, // Use user_email for the recipient
-        phone: data.mobile,
-        survey_type: reportData.surveyType,
-        total_score: Math.round(totalScore),
-        report_link: reportUrl || "Attached to this email",
-        admin_email: NOTIFICATION_EMAILS, // Keep admin in loop if needed
-        message: `
-          Dear ${data.name},
-
-          Thank you for completing the ${reportData.surveyType}. 
-
-          Your CFO Health Score is ${Math.round(totalScore)}/150.
-          
-          You can download your detailed PDF report anytime using the link below:
-          ${reportUrl || "Your report is attached below."}
-
-          Best Regards,
-          PV Advisory Team
-        `
-      };
-
-      // 5. Send Email in background and show success immediately to user
-      emailjs.send(
-        EMAILJS_SERVICE_ID, 
-        EMAILJS_TEMPLATE_ID, 
-        emailParams, 
-        EMAILJS_PUBLIC_KEY
-      ).then(res => console.log("Email sent:", res.status))
-       .catch(err => console.error("Email fail:", err));
-
+      // 5. Success is handled via setStep(101)
       setStep(101); 
       setTimeout(() => { 
          window.location.href = "/";

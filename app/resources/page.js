@@ -96,6 +96,7 @@ export default function ResourcesPage() {
           mobile: data.mobile,
           activity_title: selectedResource?.title,
           activity_type: "Resource Download",
+          report_url: selectedResource?.downloadUrl,
           metadata: {
             category: selectedResource?.category,
             source: 'Knowledge Repository'
@@ -313,7 +314,7 @@ export default function ResourcesPage() {
                    </div>
                    <div className="space-y-1">
                      <h3 className="text-xl font-bold text-gray-900">Success!</h3>
-                     <p className="text-gray-500 text-[13px] max-w-xs mx-auto">Your download will start soon...</p>
+                     <p className="text-gray-500 text-[13px] max-w-xs mx-auto">Check your email for the download link.</p>
                    </div>
                  </motion.div>
                ) : (

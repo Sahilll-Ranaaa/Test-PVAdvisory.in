@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import emailjs from "@emailjs/browser";
 import {
   Form,
   FormControl,
@@ -18,10 +17,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 const formSchema = z.object({
-  name: z.string(),
-  email: z.string().email(),
+  name: z.string().min(2, "Name is required"),
+  email: z.string().email("Invalid email format"),
   phone: z.string().optional(),
   message: z.string().optional(),
 });
@@ -30,16 +30,37 @@ export default function EngageUsForm() {
   const [loading, setLoading] = useState(false);
   const form = useForm({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      message: ""
+    }
   });
 
   async function onSubmit(values) {
     try {
       setLoading(true);
-      await emailjs.send("service_hba1urj", "template_veexuer", values, {
-        publicKey: process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY,
-      });
+      
+      if (supabase) {
+        const { error } = await supabase.from('PvAdvisoryLeadData').insert([{
+          name: values.name,
+          email: values.email,
+          mobile: values.phone,
+          activity_title: "Direct Engagement",
+          activity_type: "Engage Us",
+          metadata: {
+            message: values.message,
+            source: 'Engage Us Form'
+          }
+        }]);
+
+        if (error) throw error;
+      }
+
       setLoading(false);
-      alert("Email sent successfully!");
+      alert("Message sent successfully!");
+      form.reset();
     } catch (error) {
       setLoading(false);
       console.error("Form submission error", error);
