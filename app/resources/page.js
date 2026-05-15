@@ -4,7 +4,12 @@ import { useState, useMemo, useEffect } from "react";
 import MaxWidthWrapper from "@/components/max-width-wrapper";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { Loader2, Mail, User, Phone, Briefcase, ChevronLeft, Download, FileText, CheckCircle2, ChevronRight, Search, Filter } from "lucide-react";
+import {
+  Loader2, Mail, User, Phone, Briefcase, ChevronLeft, Download,
+  FileText, CheckCircle2, ChevronRight, Search, Filter,
+  Rocket, Calendar, FileCheck, Wallet, Building2, Receipt,
+  Settings, Target, ArrowRight, FileStack
+} from "lucide-react";
 import { STATIC_RESOURCES, CATEGORIES } from "@/lib/resource-data";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,10 +19,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { validateProfessionalEmail } from "@/lib/email-validator";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
@@ -34,6 +39,20 @@ const formSchema = z.object({
   }),
   mobile: z.string().min(10, "Invalid mobile number"),
 });
+
+const getCategoryIcon = (category) => {
+  const cat = category.toLowerCase();
+  if (cat.includes("business")) return Settings;
+  if (cat.includes("assessment")) return Rocket;
+  if (cat.includes("compliance")) return Calendar;
+  if (cat.includes("reporting")) return FileCheck;
+  if (cat.includes("finance")) return Wallet;
+  if (cat.includes("company")) return Building2;
+  if (cat.includes("invoicing")) return Receipt;
+  if (cat.includes("operations")) return Settings;
+  if (cat.includes("strategy")) return Target;
+  return FileText;
+};
 
 export default function ResourcesPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -82,7 +101,7 @@ export default function ResourcesPage() {
 
   const onSubmit = async (data) => {
     setIsGenerating(true);
-    
+
     // Switch to success state immediately for premium feel
     setIsSuccess(true);
     setIsGenerating(false);
@@ -102,7 +121,7 @@ export default function ResourcesPage() {
             source: 'Knowledge Repository'
           }
         }]).then(({ error }) => {
-           if (error) console.error("Lead storage failed:", error);
+          if (error) console.error("Lead storage failed:", error);
         });
       }
     } catch (error) {
@@ -140,7 +159,7 @@ export default function ResourcesPage() {
         </MaxWidthWrapper>
       </section>
 
-      <MaxWidthWrapper className="py-16 max-w-none ml-[5vw]">
+      <MaxWidthWrapper className="pb-16 max-w-none ml-[5vw]">
         <div className="flex flex-col lg:grid lg:grid-cols-[220px_1fr] gap-12 lg:gap-16">
 
           {/* SIDEBAR */}
@@ -187,38 +206,44 @@ export default function ResourcesPage() {
           </aside>
 
           {/* GRID */}
-          <div className="flex-1 space-y-10">
+          <div className="flex-1 space-y-0 pt-[120px]">
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
               <AnimatePresence mode="popLayout">
-                {paginatedResources.map((resource) => (
-                  <motion.div
-                    layout
-                    key={resource.id}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    whileHover={{ scale: 1.02 }}
-                    onClick={() => handleDownloadClick(resource)}
-                    className="bg-white rounded-[40px] border border-[#9f0202]/10 p-7 sm:p-8 hover:border-[#9f0202]/20 hover:shadow-[0_8px_30px_rgb(159,2,2,0.08)] transition-all duration-300 group relative overflow-hidden flex flex-col aspect-[1/1.05] cursor-pointer"
-                  >
-                    {/* Soft Hover Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-white via-white to-[#9f0202]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                    <div className="relative z-10 flex flex-col h-full">
-                      {/* Logo (Top Left, No Background) */}
-                      <div className="w-9 h-9 mb-4 transition-transform duration-300 group-hover:scale-105 origin-top-left">
-                        <Image src="/pv-logo.png" alt="PV Logo" width={36} height={36} className="w-full h-full object-contain" />
+                {paginatedResources.map((resource) => {
+                  const Icon = getCategoryIcon(resource.category);
+                  return (
+                    <motion.div
+                      layout
+                      key={resource.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      whileHover={{ y: -4 }}
+                      onClick={() => handleDownloadClick(resource)}
+                      className="bg-white rounded-2xl border border-gray-200 border-l-4 border-l-[#9f0202] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(159,2,2,0.08)] transition-all duration-300 group cursor-pointer flex flex-col min-h-[200px] relative overflow-hidden"
+                    >
+                      <div className="flex justify-between items-start mb-6">
+                        <div className="px-3 py-1 rounded-full bg-[#9f0202]/5 text-[#9f0202] text-[10px] font-bold tracking-tight">
+                          {resource.category}
+                        </div>
                       </div>
 
-                      <div className="space-y-2 mt-auto">
-                        <div className="text-[9px] font-black text-[#9f0202] uppercase tracking-[0.15em]">{resource.category}</div>
-                        <h3 className="text-[13px] md:text-[14px] font-bold text-gray-900 leading-[1.35] line-clamp-2 pr-2">
-                          {resource.title}
-                        </h3>
+                      <h3 className="text-[15px] font-bold text-gray-900 leading-tight mb-4 flex-grow pr-2">
+                        {resource.title}
+                      </h3>
+
+                      <div className="flex justify-between items-end mt-auto">
+                        <div className="flex items-center gap-2 text-gray-400 text-[11px] font-medium">
+                          <FileText size={14} />
+                          <span>{resource.type} · PDF</span>
+                        </div>
+                        <div className="text-[#9f0202] transition-all duration-300">
+                          <ArrowRight size={20} />
+                        </div>
                       </div>
-                    </div>
-                  </motion.div>
-                ))}
+                    </motion.div>
+                  );
+                })}
               </AnimatePresence>
             </div>
 
@@ -267,110 +292,110 @@ export default function ResourcesPage() {
           <div className="flex flex-col md:flex-row h-full min-h-[450px]">
             {/* Left Panel: Resource Context */}
             <div className="w-full md:w-[40%] bg-[#111111] p-8 flex flex-col relative overflow-hidden">
-               {/* Background Pattern */}
-               <div className="absolute inset-0 opacity-15 pointer-events-none">
-                  <svg width="100%" height="100%" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                      <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
-                        <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#9f0202" strokeWidth="0.5"/>
-                      </pattern>
-                    </defs>
-                    <rect width="100%" height="100%" fill="url(#grid)" />
-                  </svg>
-               </div>
-               
-               <div className="relative z-10 h-full flex flex-col">
-                  <div className="w-10 h-10 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl flex items-center justify-center p-2 mb-8">
-                    <Image src="/pv-logo.png" alt="PV Logo" width={40} height={40} className="w-full h-full object-contain" />
-                  </div>
+              {/* Background Pattern */}
+              <div className="absolute inset-0 opacity-15 pointer-events-none">
+                <svg width="100%" height="100%" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+                      <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#9f0202" strokeWidth="0.5" />
+                    </pattern>
+                  </defs>
+                  <rect width="100%" height="100%" fill="url(#grid)" />
+                </svg>
+              </div>
 
-                  <div className="space-y-4 mt-2">
-                    <div className="text-[9px] font-black text-[#9f0202] uppercase tracking-[0.2em]">{selectedResource?.category}</div>
-                    <h2 className="text-xl md:text-2xl font-bold text-white leading-tight">
-                      {selectedResource?.title}
-                    </h2>
-                    <p className="text-gray-400 text-[12px] leading-relaxed max-w-[200px]">
-                      {selectedResource?.description}
-                    </p>
-                  </div>
+              <div className="relative z-10 h-full flex flex-col">
+                <div className="w-10 h-10 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl flex items-center justify-center p-2 mb-8">
+                  <Image src="/pv-logo.png" alt="PV Logo" width={40} height={40} className="w-full h-full object-contain" />
+                </div>
 
-                  <div className="mt-auto pt-6">
-                    <div className="h-px w-10 bg-[#9f0202]/30 mb-4" />
-                    <div className="text-[9px] font-bold text-gray-500 uppercase tracking-[0.15em]">{selectedResource?.type || "INTERACTIVE PDF"}</div>
-                  </div>
-               </div>
+                <div className="space-y-4 mt-2">
+                  <div className="text-[9px] font-black text-[#9f0202] uppercase tracking-[0.2em]">{selectedResource?.category}</div>
+                  <h2 className="text-xl md:text-2xl font-bold text-white leading-tight">
+                    {selectedResource?.title}
+                  </h2>
+                  <p className="text-gray-400 text-[12px] leading-relaxed max-w-[200px]">
+                    {selectedResource?.description}
+                  </p>
+                </div>
+
+                <div className="mt-auto pt-6">
+                  <div className="h-px w-10 bg-[#9f0202]/30 mb-4" />
+                  <div className="text-[9px] font-bold text-gray-500 uppercase tracking-[0.15em]">{selectedResource?.type || "INTERACTIVE PDF"}</div>
+                </div>
+              </div>
             </div>
 
             {/* Right Panel: Lead Form */}
             <div className="w-full md:w-[60%] p-8 md:p-10 bg-white relative">
-               {isSuccess ? (
-                 <motion.div 
-                   initial={{ opacity: 0, scale: 0.95 }}
-                   animate={{ opacity: 1, scale: 1 }}
-                   className="h-full flex flex-col items-center justify-center text-center space-y-4"
-                 >
-                   <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center text-green-500 mb-2 border-4 border-green-100">
-                     <CheckCircle2 size={28} />
-                   </div>
-                   <div className="space-y-1">
-                     <h3 className="text-xl font-bold text-gray-900">Success!</h3>
-                     <p className="text-gray-500 text-[13px] max-w-xs mx-auto">Check your email for the download link.</p>
-                   </div>
-                 </motion.div>
-               ) : (
-                 <div className="space-y-6">
-                    <div className="space-y-2">
-                       <DialogTitle className="text-2xl font-bold text-gray-900 tracking-tight">Download Resource</DialogTitle>
-                       <p className="text-gray-400 text-[13px] leading-relaxed">Provide your professional details to receive the asset.</p>
+              {isSuccess ? (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="h-full flex flex-col items-center justify-center text-center space-y-4"
+                >
+                  <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center text-green-500 mb-2 border-4 border-green-100">
+                    <CheckCircle2 size={28} />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-xl font-bold text-gray-900">Success!</h3>
+                    <p className="text-gray-500 text-[13px] max-w-xs mx-auto">Check your email for the download link.</p>
+                  </div>
+                </motion.div>
+              ) : (
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <DialogTitle className="text-2xl font-bold text-gray-900 tracking-tight">Download Resource</DialogTitle>
+                    <p className="text-gray-400 text-[13px] leading-relaxed">Provide your professional details to receive the asset.</p>
+                  </div>
+
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    <div className="space-y-1.5">
+                      <Label className="text-[9px] font-black uppercase text-gray-400 tracking-widest ml-1">Full Name</Label>
+                      <Input {...register("fullName")} placeholder="Your Name" className="h-11 bg-gray-50/50 border-transparent rounded-xl focus:bg-white focus:border-[#9f0202]/20 px-4 transition-all text-[13px]" />
+                      {errors.fullName && <p className="text-[9px] text-red-500 font-bold mt-1 ml-1">{errors.fullName.message}</p>}
                     </div>
 
-                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                       <div className="space-y-1.5">
-                          <Label className="text-[9px] font-black uppercase text-gray-400 tracking-widest ml-1">Full Name</Label>
-                          <Input {...register("fullName")} placeholder="Your Name" className="h-11 bg-gray-50/50 border-transparent rounded-xl focus:bg-white focus:border-[#9f0202]/20 px-4 transition-all text-[13px]" />
-                          {errors.fullName && <p className="text-[9px] text-red-500 font-bold mt-1 ml-1">{errors.fullName.message}</p>}
-                       </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-[9px] font-black uppercase text-gray-400 tracking-widest ml-1">Email*</Label>
+                      <Input {...register("email")} placeholder="name@company.com" className="h-11 bg-gray-50/50 border-transparent rounded-xl focus:bg-white focus:border-[#9f0202]/20 px-4 transition-all text-[13px]" />
+                      {errors.email && <p className="text-[9px] text-red-500 font-bold mt-1 ml-1">{errors.email.message}</p>}
+                    </div>
 
-                       <div className="space-y-1.5">
-                          <Label className="text-[9px] font-black uppercase text-gray-400 tracking-widest ml-1">Email*</Label>
-                          <Input {...register("email")} placeholder="name@company.com" className="h-11 bg-gray-50/50 border-transparent rounded-xl focus:bg-white focus:border-[#9f0202]/20 px-4 transition-all text-[13px]" />
-                          {errors.email && <p className="text-[9px] text-red-500 font-bold mt-1 ml-1">{errors.email.message}</p>}
-                       </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-[9px] font-black uppercase text-gray-400 tracking-widest ml-1">Mobile Number</Label>
+                      <PhoneInput
+                        defaultCountry="IN"
+                        value={watch("mobile")}
+                        onChange={(val) => setValue("mobile", val, { shouldValidate: true })}
+                        className="bg-gray-50/50 rounded-xl border-transparent h-11 flex items-center overflow-hidden focus-within:ring-1 focus-within:ring-[#9f0202]/20 transition-all text-[13px]"
+                      />
+                      {errors.mobile && <p className="text-[9px] text-red-500 font-bold mt-1 ml-1">{errors.mobile.message}</p>}
+                    </div>
 
-                       <div className="space-y-1.5">
-                          <Label className="text-[9px] font-black uppercase text-gray-400 tracking-widest ml-1">Mobile Number</Label>
-                          <PhoneInput 
-                            defaultCountry="IN"
-                            value={watch("mobile")}
-                            onChange={(val) => setValue("mobile", val, { shouldValidate: true })}
-                            className="bg-gray-50/50 rounded-xl border-transparent h-11 flex items-center overflow-hidden focus-within:ring-1 focus-within:ring-[#9f0202]/20 transition-all text-[13px]"
-                          />
-                          {errors.mobile && <p className="text-[9px] text-red-500 font-bold mt-1 ml-1">{errors.mobile.message}</p>}
-                       </div>
+                    <div className="pt-2 space-y-4">
+                      <Button
+                        type="submit"
+                        disabled={isGenerating}
+                        className="w-full h-12 bg-[#9f0202] hover:bg-[#800000] text-white font-bold rounded-xl shadow-[0_10px_20px_rgba(159,2,2,0.15)] transition-all active:scale-[0.98] relative overflow-hidden group text-sm"
+                      >
+                        <div className="relative z-10 flex items-center justify-center gap-2">
+                          {isGenerating ? <Loader2 className="animate-spin" size={18} /> : <Download size={18} />}
+                          {isGenerating ? "Processing..." : "Download Template"}
+                        </div>
+                      </Button>
 
-                       <div className="pt-2 space-y-4">
-                          <Button 
-                            type="submit" 
-                            disabled={isGenerating}
-                            className="w-full h-12 bg-[#9f0202] hover:bg-[#800000] text-white font-bold rounded-xl shadow-[0_10px_20px_rgba(159,2,2,0.15)] transition-all active:scale-[0.98] relative overflow-hidden group text-sm"
-                          >
-                            <div className="relative z-10 flex items-center justify-center gap-2">
-                               {isGenerating ? <Loader2 className="animate-spin" size={18} /> : <Download size={18} />}
-                               {isGenerating ? "Processing..." : "Download Template"}
-                            </div>
-                          </Button>
-                          
-                          <button 
-                            type="button"
-                            onClick={() => setSelectedResource(null)}
-                            className="w-full text-center text-[10px] font-bold text-gray-400 hover:text-gray-600 transition-colors uppercase tracking-widest"
-                          >
-                            Maybe later, take me back
-                          </button>
-                       </div>
-                    </form>
-                 </div>
-               )}
+                      <button
+                        type="button"
+                        onClick={() => setSelectedResource(null)}
+                        className="w-full text-center text-[10px] font-bold text-gray-400 hover:text-gray-600 transition-colors uppercase tracking-widest"
+                      >
+                        Maybe later, take me back
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
             </div>
           </div>
         </DialogContent>
