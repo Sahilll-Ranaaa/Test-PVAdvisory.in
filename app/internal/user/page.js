@@ -116,7 +116,7 @@ export default function AdminPage() {
       const matchesSearch = 
         (lead.name?.toLowerCase().includes(leadSearch.toLowerCase())) ||
         (lead.email?.toLowerCase().includes(leadSearch.toLowerCase())) ||
-        (lead.mobile?.includes(leadSearch));
+        (lead.company_name?.toLowerCase().includes(leadSearch.toLowerCase()));
       
       const matchesFilter = 
         leadFilter === "all" || 
@@ -446,7 +446,7 @@ export default function AdminPage() {
                    <div className="relative flex-1">
                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                      <Input 
-                        placeholder="Search by name, email or mobile..." 
+                        placeholder="Search by name, email or company..." 
                         value={leadSearch}
                         onChange={(e) => setLeadSearch(e.target.value)}
                         className="pl-10 h-10 rounded-xl bg-white border-gray-200 text-xs"
@@ -490,7 +490,7 @@ export default function AdminPage() {
                           </td>
                           <td className="px-8 py-6">
                             <div className="font-bold text-gray-800 text-xs">{lead.email}</div>
-                            <div className="text-[10px] text-gray-400 font-medium mt-0.5">{lead.mobile}</div>
+                            <div className="text-[10px] text-gray-400 font-medium mt-0.5">{lead.company_name || "N/A"}</div>
                           </td>
                           <td className="px-8 py-6">
                             <div className="font-bold text-gray-900 text-xs">{lead.activity_title || "Untitled Activity"}</div>

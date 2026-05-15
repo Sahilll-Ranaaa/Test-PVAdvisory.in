@@ -13,8 +13,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { generateReport, generateInternalReport } from "@/lib/generate-report";
 import { saveLead } from "@/lib/admin-store";
-import { PhoneInput } from "@/components/ui/phone-input";
-import { isValidPhoneNumber } from "react-phone-number-input";
 import { validateProfessionalEmail } from "@/lib/email-validator";
 import { supabase } from "@/lib/supabase";
 
@@ -28,7 +26,7 @@ const formSchema = z.object({
   }, {
     message: "Please provide a valid professional email address"
   }),
-  mobile: z.string().min(10, "Phone number must be at least 10 digits"),
+  companyName: z.string().min(2, "Company name is required"),
 });
 
 export default function SurveySection({ preselectedType = null, isStandalone = false }) {
@@ -73,7 +71,7 @@ export default function SurveySection({ preselectedType = null, isStandalone = f
     resolver: zodResolver(formSchema),
     mode: "onChange", // Enable real-time validation
     defaultValues: {
-      mobile: "",
+      companyName: "",
     }
   });
 
@@ -135,7 +133,7 @@ export default function SurveySection({ preselectedType = null, isStandalone = f
     const reportData = {
       name: data.name,
       email: data.email,
-      mobile: data.mobile,
+      company_name: data.companyName,
       score: totalScore, 
       dimensionScores, 
       answers,
@@ -201,7 +199,7 @@ export default function SurveySection({ preselectedType = null, isStandalone = f
           .insert([{
             name: data.name,
             email: data.email,
-            mobile: data.mobile,
+            company_name: data.companyName,
             activity_title: reportData.surveyType,
             activity_type: "Survey Assessment",
             score: totalScore,
@@ -340,14 +338,13 @@ export default function SurveySection({ preselectedType = null, isStandalone = f
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] text-gray-600 font-bold uppercase tracking-widest">Mobile Number*</Label>
-                    <PhoneInput 
-                      defaultCountry="IN"
-                      value={watch("mobile")}
-                      onChange={(val) => setValue("mobile", val, { shouldValidate: true })}
-                      className="bg-gray-50 rounded-lg border-transparent h-10 flex items-center overflow-hidden focus-within:ring-1 focus-within:ring-[#9f0202]"
+                    <Label className="text-[9px] text-gray-600 font-bold uppercase tracking-widest">Company Name*</Label>
+                    <Input
+                      {...register("companyName")}
+                      className="bg-gray-50 border-transparent h-10 rounded-lg focus:border-[#9f0202] text-sm px-4"
+                      placeholder="Enter your company name"
                     />
-                    {errors.mobile && <p className="text-[9px] text-red-500 mt-1">{errors.mobile.message}</p>}
+                    {errors.companyName && <p className="text-[9px] text-red-500 mt-1">{errors.companyName.message}</p>}
                   </div>
 
                   <div className="flex items-center gap-3 pt-3">

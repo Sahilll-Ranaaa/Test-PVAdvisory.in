@@ -17,7 +17,6 @@ import { cn } from "@/lib/utils";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { PhoneInput } from "@/components/ui/phone-input";
 import { validateProfessionalEmail } from "@/lib/email-validator";
 import {
   Dialog,
@@ -37,7 +36,7 @@ const formSchema = z.object({
   }, {
     message: "Please provide a valid professional email address"
   }),
-  mobile: z.string().min(10, "Invalid mobile number"),
+  companyName: z.string().min(2, "Company name is required"),
 });
 
 const getCategoryIcon = (category) => {
@@ -71,7 +70,7 @@ export default function ResourcesPage() {
     resolver: zodResolver(formSchema),
     mode: "onChange",
     defaultValues: {
-      mobile: "",
+      companyName: "",
     }
   });
 
@@ -112,7 +111,7 @@ export default function ResourcesPage() {
         supabase.from('PvAdvisoryLeadData').insert([{
           name: data.fullName,
           email: data.email,
-          mobile: data.mobile,
+          company_name: data.companyName,
           activity_title: selectedResource?.title,
           activity_type: "Resource Download",
           report_url: selectedResource?.downloadUrl,
@@ -291,7 +290,7 @@ export default function ResourcesPage() {
         <DialogContent className="sm:max-w-[650px] p-0 overflow-hidden rounded-[2rem] border-none shadow-2xl bg-white">
           <div className="flex flex-col md:flex-row h-full min-h-[450px]">
             {/* Left Panel: Resource Context */}
-            <div className="w-full md:w-[40%] bg-[#111111] p-8 flex flex-col relative overflow-hidden">
+            <div className="w-full md:w-[40%] bg-[#2E2F2F] p-8 flex flex-col relative overflow-hidden"> 
               {/* Background Pattern */}
               <div className="absolute inset-0 opacity-15 pointer-events-none">
                 <svg width="100%" height="100%" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
@@ -305,23 +304,18 @@ export default function ResourcesPage() {
               </div>
 
               <div className="relative z-10 h-full flex flex-col">
-                <div className="w-10 h-10 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl flex items-center justify-center p-2 mb-8">
+                <div className="w-11 h-11 bg-white backdrop-blur-lg border border-white/10 rounded-xl flex items-center justify-center p-2 mb-8">
                   <Image src="/pv-logo.png" alt="PV Logo" width={40} height={40} className="w-full h-full object-contain" />
                 </div>
 
                 <div className="space-y-4 mt-2">
-                  <div className="text-[9px] font-black text-[#9f0202] uppercase tracking-[0.2em]">{selectedResource?.category}</div>
+                  <div className="text-[12px] font-black text-[#9f0202] uppercase tracking-[0.2em]">{selectedResource?.category}</div>
                   <h2 className="text-xl md:text-2xl font-bold text-white leading-tight">
                     {selectedResource?.title}
                   </h2>
                   <p className="text-gray-400 text-[12px] leading-relaxed max-w-[200px]">
                     {selectedResource?.description}
                   </p>
-                </div>
-
-                <div className="mt-auto pt-6">
-                  <div className="h-px w-10 bg-[#9f0202]/30 mb-4" />
-                  <div className="text-[9px] font-bold text-gray-500 uppercase tracking-[0.15em]">{selectedResource?.type || "INTERACTIVE PDF"}</div>
                 </div>
               </div>
             </div>
@@ -363,14 +357,13 @@ export default function ResourcesPage() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label className="text-[9px] font-black uppercase text-gray-400 tracking-widest ml-1">Mobile Number</Label>
-                      <PhoneInput
-                        defaultCountry="IN"
-                        value={watch("mobile")}
-                        onChange={(val) => setValue("mobile", val, { shouldValidate: true })}
-                        className="bg-gray-50/50 rounded-xl border-transparent h-11 flex items-center overflow-hidden focus-within:ring-1 focus-within:ring-[#9f0202]/20 transition-all text-[13px]"
+                      <Label className="text-[9px] font-black uppercase text-gray-400 tracking-widest ml-1">Company Name</Label>
+                      <Input
+                        {...register("companyName")}
+                        placeholder="Your Company"
+                        className="h-11 bg-gray-50/50 border-transparent rounded-xl focus:bg-white focus:border-[#9f0202]/20 px-4 transition-all text-[13px]"
                       />
-                      {errors.mobile && <p className="text-[9px] text-red-500 font-bold mt-1 ml-1">{errors.mobile.message}</p>}
+                      {errors.companyName && <p className="text-[9px] text-red-500 font-bold mt-1 ml-1">{errors.companyName.message}</p>}
                     </div>
 
                     <div className="pt-2 space-y-4">
@@ -384,14 +377,6 @@ export default function ResourcesPage() {
                           {isGenerating ? "Processing..." : "Download Template"}
                         </div>
                       </Button>
-
-                      <button
-                        type="button"
-                        onClick={() => setSelectedResource(null)}
-                        className="w-full text-center text-[10px] font-bold text-gray-400 hover:text-gray-600 transition-colors uppercase tracking-widest"
-                      >
-                        Maybe later, take me back
-                      </button>
                     </div>
                   </form>
                 </div>
